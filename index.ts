@@ -6,11 +6,11 @@ export type Bundler = 'parcel' | 'esbuild' | 'webpack'
 export type PkgConf = {
   [key: string]: any
 }
-
 export type ModuleConf = {
   key: string
   conf: object
 }
+
 function execP(
   command: string
 ): Promise<{
@@ -89,13 +89,7 @@ function bundler(ty?: Bundler) {
     localConf.devDependencies.typescript = 'latest'
 
     // Rewrite package.json
-    writeFileSync(resolve('package.json'), JSON.stringify(localConf))
-
-    // Install deps
-    await execP('npm install')
-
-    // Format package.json
-    await execP('npx prettier -w package.json')
+    writeFileSync(resolve('package.json'), JSON.stringify(localConf, null, 2))
 
     console.log('✨ Done: ready to go!')
   } else {
