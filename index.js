@@ -76,11 +76,7 @@ function bundler(ty) {
         // TS
         localConf.devDependencies.typescript = 'latest';
         // Rewrite package.json
-        fs_1.writeFileSync(path_1.resolve('package.json'), JSON.stringify(localConf));
-        // Install deps
-        yield execP('npm install');
-        // Format package.json
-        yield execP('npx prettier -w package.json');
+        fs_1.writeFileSync(path_1.resolve('package.json'), JSON.stringify(localConf, null, 2));
         console.log('✨ Done: ready to go!');
     }
     else {
