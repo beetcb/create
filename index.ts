@@ -1,11 +1,20 @@
+#!/usr/bin/env node
+import yargs from 'yargs'
+import fetch from 'node-fetch'
 import { exec } from 'child_process'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 
-export type Bundler = 'parcel' | 'esbuild' | 'webpack'
+export type Arguments = {
+  bundler?: string
+  remote?: string
+  ts?: boolean
+}
+
 export type PkgConf = {
   [key: string]: any
 }
+
 export type ModuleConf = {
   key: string
   conf: object
@@ -31,7 +40,13 @@ function exist(fileName: string) {
   return existsSync(resolve(fileName)) ? true : false
 }
 
-function loadConf() {
+async function loadConf(remote?: string): Promise<PkgConf> {
+  if (remote) {
+    const data = await fetch(remote)
+    return await data.json()
+  } else if (typeof remote === 'string') {
+    return {}
+  }
   return JSON.parse(readFileSync(resolve('package.json'), 'utf8'))
 }
 
@@ -56,7 +71,7 @@ function prettier(remoteConf?: PkgConf): ModuleConf {
   }
 }
 
-function bundler(ty?: Bundler) {
+function getBundler(ty?: string) {
   const deps: Array<string> = []
   switch (ty) {
     case 'webpack':
@@ -71,22 +86,39 @@ function bundler(ty?: Bundler) {
   return deps
 }
 
+function cmdInterface(): Arguments {
+  return yargs(process.argv.slice(2)).options({
+    bundler: { type: 'string' },
+    remote: { type: 'string' },
+    ts: { type: 'boolean' },
+  }).argv
+}
+
 ;(async () => {
   if (!exist('package.json')) {
     await execP('npm init -y')
-    const localConf: PkgConf = loadConf()
+    const localConf: PkgConf = await loadConf()
     localConf.devDependencies = {}
     delete localConf.scripts.test
 
+    // Parse args
+    const { bundler, remote, ts } = cmdInterface()
+
+    // LoadRemoteConf
+    const remoteConf = await loadConf(remote || '')
+
+    // TS
+    if (ts) localConf.devDependencies.typescript = 'latest'
+
+    // Scripts
+    if (remoteConf.scripts) localConf.scripts = remoteConf.scripts
+
     // Prettier
-    localConf.prettier = prettier().conf
+    localConf.prettier = prettier(remoteConf).conf
     localConf.devDependencies.prettier = 'latest'
 
     // Bundler
-    bundler().forEach((e) => (localConf.devDependencies[e] = 'latest'))
-
-    // TS
-    localConf.devDependencies.typescript = 'latest'
+    getBundler(bundler).forEach((e) => (localConf.devDependencies[e] = 'latest'))
 
     // Rewrite package.json
     writeFileSync(resolve('package.json'), JSON.stringify(localConf, null, 2))
