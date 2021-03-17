@@ -1,16 +1,17 @@
 {
-  "name": "create",
-  "version": "1.0.0",
-  "description": "",
-  "bin": "./index.js",
-  "scripts": {
-    "build": "tsc"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^14.14.35",
-    "esbuild": "^0.9.2",
-    "typescript": "^4.2.3"
+    "name": "create",
+    "version": "1.0.0",
+    "description": "",
+    "bin": "./index.js",
+    "scripts": {
+      "build": "tsc"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/node": "^14.14.35",
+      "esbuild": "^0.9.2",
+      "typescript": "^4.2.3"
+    }
   }
-}
+  
