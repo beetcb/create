@@ -2,7 +2,9 @@ import { exec } from 'child_process'
 import { existsSync } from 'fs'
 import { resolve } from 'path'
 
-function execP<T>(
+export type Bundler = 'parcel' | 'esbuild' | 'webpack'
+
+function execP(
   command: string
 ): Promise<{
   stdout: string
@@ -18,7 +20,7 @@ function execP<T>(
   })
 }
 
-function exist(fileName: string): boolean {
+function exist(fileName: string) {
   return existsSync(resolve(fileName)) ? true : false
 }
 
@@ -33,3 +35,5 @@ function prettier(): { key: string; conf: object } {
     },
   }
 }
+
+function bundler(ty: Bundler) {}
