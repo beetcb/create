@@ -5,17 +5,17 @@ import { exec } from 'child_process'
 import { resolve } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 
-export type Arguments = {
+type Arguments = {
   bundler?: string
   remote?: string
   ts?: boolean
 }
 
-export type PkgConf = {
+type PkgConf = {
   [key: string]: any
 }
 
-export type ModuleConf = {
+type ModuleConf = {
   key: string
   conf: object
 }
