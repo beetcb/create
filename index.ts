@@ -20,6 +20,8 @@ type ModuleConf = {
   conf: object
 }
 
+type Bundler = 'parcel' | 'esbuild' | 'webpack' | 'rollup'
+
 function execP(
   command: string
 ): Promise<{
@@ -71,7 +73,7 @@ function prettier(remoteConf?: PkgConf): ModuleConf {
   }
 }
 
-function getBundler(ty?: string) {
+function getBundler(ty?: Bundler) {
   const deps: Array<string> = []
   switch (ty) {
     case 'webpack':
@@ -80,8 +82,12 @@ function getBundler(ty?: string) {
     case 'esbuild':
       deps.push('esbuild')
       break
-    default:
+    case 'parcel':
       deps.push('parcel')
+      break
+    case 'rollup':
+      deps.push('rollup')
+      break
   }
   return deps
 }
@@ -118,7 +124,11 @@ function cmdInterface(): Arguments {
     localConf.devDependencies.prettier = 'latest'
 
     // Bundler
-    getBundler(bundler).forEach((e) => (localConf.devDependencies[e] = 'latest'))
+
+    if (bundler) {
+      const bundlerTyped = bundler as Bundler
+      getBundler(bundlerTyped).forEach((e) => (localConf.devDependencies[e] = 'latest'))
+    }
 
     // Rewrite package.json
     writeFileSync(resolve('package.json'), JSON.stringify(localConf, null, 2))
