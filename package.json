@@ -1,6 +1,6 @@
 {
     "name": "@npmcreate/create",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "configurable npm initializer",
     "files": [
         "./index.js"

@@ -45,6 +45,7 @@ function exist(fileName: string) {
 async function loadConf(remote?: string): Promise<PkgConf> {
   if (remote) {
     const data = await fetch(remote)
+    console.log('🚀 Conf: grabbed remote package.json file')
     return await data.json()
   } else if (typeof remote === 'string') {
     return {}
@@ -105,9 +106,9 @@ function cmdInterface(): Arguments {
     await execP('npm init -y')
     const localConf: PkgConf = await loadConf()
     localConf.devDependencies = {}
-    delete localConf.scripts.test
+    delete localConf.scripts
 
-    // Parse args
+    // Parse cli args
     const { bundler, remote, ts } = cmdInterface()
 
     // LoadRemoteConf
@@ -124,11 +125,7 @@ function cmdInterface(): Arguments {
     localConf.devDependencies.prettier = 'latest'
 
     // Bundler
-
-    if (bundler) {
-      const bundlerTyped = bundler as Bundler
-      getBundler(bundlerTyped).forEach((e) => (localConf.devDependencies[e] = 'latest'))
-    }
+    if (bundler) getBundler(bundler as Bundler).forEach((e) => (localConf.devDependencies[e] = 'latest'))
 
     // Rewrite package.json
     writeFileSync(resolve('package.json'), JSON.stringify(localConf, null, 2))
